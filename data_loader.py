@@ -42,8 +42,6 @@ def raw_data_loader(args):
         data_files["test"] = args.test_file
 
     if 'samsum' in args.train_file:
-        #extension      = args.train_file.split(".")[-1]
-        #raw_datasets   = load_dataset(extension, data_files=data_files) # leads to unknow bug
         train_dict      = load_mask_info_from_samsum(args, args.train_file)
         validation_dict = load_mask_info_from_samsum(args, args.validation_file)
         test_dict       = load_mask_info_from_samsum(args, args.test_file)
@@ -64,51 +62,7 @@ def raw_data_loader(args):
     return raw_datasets
 
 
-def load_cngen_from_samsum(args, file_path):
-    ''' load samsum csv data '''
-
-    id_list       = []
-    dialogue_list = []
-    summary_list  = []
-
-    with open(file_path, mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            Id = row['id']
-            dialogue = row['dialogue']
-            summary = row['summary']
-
-            dialogue_sep = dialogue.split('\n')
-            length = len(dialogue_sep)
-
-            input_str = "Context - \n" + dialogue_sep[0] + "\n"
-            for i in range(1, length):
-                try:
-                    speaker = dialogue_sep[i].split(':')[0]
-                    target = dialogue_sep[i].split(':')[1]
-
-                    id_list.append(Id + '_' + str(i))
-                    dialogue_list.append(input_str + "Speaker - " + speaker)
-                    summary_list.append(target)
-
-                except:
-                    pass
-                
-                input_str += dialogue_sep[i] + "\n"
-
-    data_dict = {'id': id_list,
-                 'dialogue': dialogue_list,
-                 'summary': summary_list
-                 }
-
-    data_dict = Dataset.from_dict(data_dict)
-
-    return data_dict
-
-
-
-
-
+# Masking Functions
 def string_overlap(summary_list, utterance_list):
     count = 0
     
@@ -117,7 +71,6 @@ def string_overlap(summary_list, utterance_list):
             count += 1
     
     return count
-
 
 def length_bucket(utterance_list):
     length = len(utterance_list)
@@ -128,104 +81,7 @@ def length_bucket(utterance_list):
         return "L"
     
     return "M"
-
-
-def load_cngen_turns_from_samsum(args, file_path):
-    ''' load samsum csv data '''
-
-    id_list       = []
-    dialogue_list = []
-    summary_list  = []
-
-    with open(file_path, mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            Id = row['id']
-            dialogue = row['dialogue']
-            summary = row['summary']
-
-            dialogue_sep = dialogue.split('\n')
-            length = len(dialogue_sep)
-
-            input_str = "Summary - " + summary + "\n" + "Context - \n"
-            for i in range(length):
-                try:
-                    speaker = dialogue_sep[i].split(':')[0]
-                    target = dialogue_sep[i].split(':')[1]
-
-                    turns = "Turns - " + str(length - i) + "\n"
-                    speaker = "Speaker - " + speaker + "\n"
-
-                    overlap = string_overlap(summary.split(), target.split())
-                    total = len(summary.split())
-                    add_info = "Overlap - " + str(overlap) + ", Total - " + str(total) + "\n"
-
-                    length_info = "Length - " + length_bucket(target.split())
-
-                    id_list.append(Id + '_' + str(i))
-                    dialogue_list.append(input_str + "\n" + turns + speaker + add_info + length_info)
-                    summary_list.append(target)
-                except:
-                    pass
-
-                input_str += dialogue_sep[i] + "\n"
-
-    data_dict = {'id': id_list,
-                 'dialogue': dialogue_list,
-                 'summary': summary_list
-                 }
-
-    data_dict = Dataset.from_dict(data_dict)
-
-    return data_dict
-
-
-
-
-
-
-def load_cngen_summary_from_samsum(args, file_path):
-    ''' load samsum csv data '''
-
-    id_list       = []
-    dialogue_list = []
-    summary_list  = []
-
-    with open(file_path, mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            Id = row['id']
-            dialogue = row['dialogue']
-            summary = row['summary']
-
-            dialogue_sep = dialogue.split('\n')
-            length = len(dialogue_sep)
-
-            input_str = "Summary - " + summary + "\n" + "Context - \n"
-            for i in range(length):
-                try:
-                    speaker = dialogue_sep[i].split(':')[0]
-                    target = dialogue_sep[i].split(':')[1]
-
-                    id_list.append(Id + '_' + str(i))
-                    dialogue_list.append(input_str + "Speaker - " + speaker)
-                    summary_list.append(target)
-                except:
-                    pass
-
-                input_str += dialogue_sep[i] + "\n"
-
-    data_dict = {'id': id_list,
-                 'dialogue': dialogue_list,
-                 'summary': summary_list
-                 }
-
-    data_dict = Dataset.from_dict(data_dict)
-
-    return data_dict
-
-
-
+# Masking Functions
 
 
 def load_mask_info_from_samsum(args, file_path):
@@ -279,134 +135,6 @@ def load_mask_info_from_samsum(args, file_path):
     return data_dict
 
 
-
-
-def load_firstutterance_from_samsum(args, file_path):
-    ''' load samsum csv data '''
-
-    id_list       = []
-    dialogue_list = []
-    summary_list  = []
-
-    with open(file_path, mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            id_list.append(row['id'])
-            dialogue_list.append("Summary - " + row['summary'] + "\n" + "Dialogue - " + row['dialogue'].split('\n')[0] + '\n')
-            summary_list.append(row['dialogue'])
-
-    data_dict = {'id': id_list,
-                 'dialogue': dialogue_list,
-                 'summary': summary_list
-                 }
-
-    data_dict = Dataset.from_dict(data_dict)
-
-    return data_dict
-
-
-
-def load_mask_from_samsum(args, file_path):
-    ''' load samsum csv data '''
-
-    id_list       = []
-    dialogue_list = []
-    summary_list  = []
-
-    with open(file_path, mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            Id = row['id']
-            dialogue = row['dialogue']
-            summary = row['summary']
-
-            dialogue_sep = dialogue.split('\n')
-            length = len(dialogue_sep)
-            list_sz = int(length * 0.3)
-            if list_sz < 1:
-                list_sz = 1
-            rand_list = list(np.random.randint(length, size=list_sz))
-
-            count = 0
-            for i in rand_list:
-                input_str = "Summary - \n" + summary + "\n" + "Dialogue - \n"
-                for j in range(length):
-                    if j == i:
-                        input_str += "<mask>" + "\n"
-                    else:
-                        input_str += dialogue_sep[j] + "\n"
-
-                id_list.append(Id + '_' + str(count))
-                dialogue_list.append(input_str)
-                summary_list.append(dialogue_sep[i])
-
-                count +=1
-
-    data_dict = {'id': id_list,
-                 'dialogue': dialogue_list,
-                 'summary': summary_list
-                 }
-
-    data_dict = Dataset.from_dict(data_dict)
-
-    return data_dict
-
-
-
-def load_multiple_mask_from_samsum(args, file_path):
-    ''' load samsum csv data '''
-
-    id_list       = []
-    dialogue_list = []
-    summary_list  = []
-
-    with open(file_path, mode='r') as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        for row in csv_reader:
-            Id = row['id']
-            dialogue = row['dialogue']
-            summary = row['summary']
-
-            repeat, mask_percent = 3, 0.3
-
-            dialogue_sep = dialogue.split('\n')
-            length = len(dialogue_sep)
-            list_sz = int(length * mask_percent)
-            if list_sz < 1:
-                list_sz = 1
-
-            for i in range(repeat):
-
-                rand_list = np.arange(length)
-                np.random.shuffle(rand_list)
-                rand_list = list(rand_list[:list_sz])
-
-                count = 1
-                input_str = "Summary - \n" + summary + "\n" + "Dialogue - \n"
-                target_str = ""
-                for j in range(length):
-                    if j in rand_list:
-                        input_str += "<mask_" + str(count) + ">" + "\n"
-                        target_str += "<mask_" + str(count) + "> " + dialogue_sep[j] + "\n"
-                        count += 1
-                    else:
-                        input_str += dialogue_sep[j] + "\n"
-
-                id_list.append(Id + '_' + str(i))
-                dialogue_list.append(input_str)
-                summary_list.append(target_str)
-
-    data_dict = {'id': id_list,
-                 'dialogue': dialogue_list,
-                 'summary': summary_list
-                 }
-
-    data_dict = Dataset.from_dict(data_dict)
-
-    return data_dict
-
-
-
 def load_from_samsum(args, file_path):
     ''' load samsum csv data '''
 
@@ -429,7 +157,6 @@ def load_from_samsum(args, file_path):
     data_dict = Dataset.from_dict(data_dict)
 
     return data_dict
-
 
 
 def load_mask_info_from_dialogsum(args, file_path):
