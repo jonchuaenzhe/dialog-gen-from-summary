@@ -3,7 +3,7 @@ Apr 2022 - Aug 2022
 
 This project is a Summer Undergrad Research Project under NUS HLT Lab with guidance from Dr Wang Bin.
 
-Data for dialogue summarization is very limited as summaries have to be hand-annotated. A proposed solution is to use a generation model to produce more dialogue examples from the same summary label to increase the dataset. This project attempts to do so, with ultimately disappointing results as the augmented data does little to improve accuracy of dialogue summarization models.
+Data for dialogue summarization is very limited as summaries have to be hand-annotated. A proposed solution is to use a generation model to produce more dialogue examples from the same summary label to increase the dataset. This project attempts to evaluate the proposed solution.
 
 With a small training set of 1000 dialogue-summary pairs, a BART model achieved the following on a test-set:
 ```
@@ -37,7 +37,7 @@ To replicate the experiment, the files have to be run according to the instructi
 
 ## Dialog Generation Model
 
-The SAMSUM dataset was used for training a dialogue generation model. A dialogue and its corresponding summary was fed into the model, with one utterance being masked. With additional info such as "utterance length" and "overlap with summary", the model was trained to generate the utterance. An example input is as follows:
+The SAMSUM dataset was used to train a dialogue generation model. A dialogue and its summary was fed into the model, with one utterance being masked. With additional info such as "utterance length" and "overlap with summary", the model was trained to generate the utterance. An example input is as follows:
 ```
 Summary - Rashi is confused by too many career choices. Teacher advises him to choose something he has passion for and what interests him.
 Dialogue - 
