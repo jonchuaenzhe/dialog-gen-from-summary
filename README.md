@@ -33,7 +33,7 @@ conda install -c conda-forge datasets=1.15.1
 conda install -c anaconda scipy
 pip install py-rouge
 ```
-To replicate the experiment, the files have to be run according to the instructions in sequence.
+To replicate the experiment, the files have to be run according to the instructions in sequence. All model outputs (predictions) can be seen in the "output/" folder.
 
 ## Dialog Generation Model
 
@@ -76,13 +76,13 @@ To analyze the model's generalizability to different datasets, the pre-trained m
 
 ### Fine-tuning the Model
 
-Since the model was trained on SAMSUM, it had to be fine-tuned on the DialogSum data before it could generate new DS pairs. The 1000 pairs were split into 2 groups, and fine-tuning was done on one group of 500 before the model was used to generate additional pairs based on the other group (fine-tuning is like training, while generation is prediction). The groups were then swapped.
+Since the model was trained on SAMSUM, it had to be fine-tuned on DialogSum data before it could generate new pairs. The 1000 pairs were split into 2, and fine-tuning was done on one group of 500 before the model was used to generate new dialogues from the other group. The groups were then swapped.
 
 For finetuning, specify the right output directory (whether the first 500 or second 500) and run the following command:
 ```
 ./run_mask_dialogsum_bart_base.sh
 ```
-Results can be seen in the file "rrun_mask_finetune_dialogsum0-500_bart_base.log" or "run_mask_finetune_dialogsum500-1k_bart_base.log".
+Results can be seen in the file "run_mask_finetune_dialogsum0-500_bart_base.log" or "run_mask_finetune_dialogsum500-1k_bart_base.log".
 
 ### Dialogue Generation for Data Augmentation
 
@@ -90,7 +90,7 @@ To generate sufficiently varied data, 30-40% of the utterances should be new. Th
 
 ## Dialogue Summarization with Augmented Data
 
-After adding the augmented data to the original 1000 DS pairs (saved into "dialogsum.augmented1k.jsonl"), the new file was then run through the BART model for summarization task. However, the final results did not show any improvement in summarization performance.
+After adding the augmented data to the original 1000 DS pairs (saved into "dialogsum.augmented1k.jsonl"), the new file was then run through the BART model for the summarization task. However, the final results did not show any improvement in summarization performance.
 
 For dialogue summarization, run the following command:
 ```
