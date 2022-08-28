@@ -1,6 +1,8 @@
 Apr 2022 - Aug 2022
 # Summary-Based Dialogue Generation for Data Augmentation with BART
 
+This project is a Summer Undergrad Research Project under NUS HLT Lab with guidance from Dr Wang Bin.
+
 Data for dialogue summarization is very limited as summaries have to be hand-annotated. A proposed solution is to use a generation model to produce more dialogue examples from the same summary label to increase the dataset. This project attempts to do so, with ultimately disappointing results as the augmented data does little to improve accuracy of dialogue summarization models.
 
 With a small training set of 1000 dialogue-summary pairs, a BART model achieved the following on a test-set:
@@ -31,6 +33,7 @@ conda install -c conda-forge datasets=1.15.1
 conda install -c anaconda scipy
 pip install py-rouge
 ```
+To replicate the experiment, the files have to be run according to the instructions in sequence.
 
 ## Dialog Generation Model
 
@@ -61,33 +64,36 @@ rouge-2:	P: 13.66	R: 12.42	F1: 12.73
 rouge-l:	P: 31.37	R: 28.94	F1: 29.59
 bleu-1: 0.182	bleu-2: 0.079	bleu-3: 0.045	bleu-4: 0.026	meteor: 0.168
 ```
+To train the generation model, run the following command:
+```
+./run_mask_samsum_bart_base.sh
+```
+Results can be seen in the file "run_mask_info_samsum_bart_base.log".
 
-## Finetuning the Generation Model
+## Augmenting Dataset with New Dialogue-Summary (DS) Pairs
 
+To analyze the model's generalizability to different datasets, the pre-trained model was deployed on another dataset, DialogSum. 1000 DS pairs were selected for augmentation.
 
+### Fine-tuning the Model
 
+Since the model was trained on SAMSUM, it had to be fine-tuned on the DialogSum data before it could generate new DS pairs. The 1000 pairs were split into 2 groups, and fine-tuning was done on one group of 500 before the model was used to generate additional pairs based on the other group (fine-tuning is like training, while generation is prediction). The groups were then swapped.
 
+For finetuning, specify the right output directory (whether the first 500 or second 500) and run the following command:
+```
+./run_mask_dialogsum_bart_base.sh
+```
+Results can be seen in the file "rrun_mask_finetune_dialogsum0-500_bart_base.log" or "run_mask_finetune_dialogsum500-1k_bart_base.log".
 
+### Dialogue Generation for Data Augmentation
 
+To generate sufficiently varied data, 30-40% of the utterances should be new. Thus, a sequential generation method is used by pre-selecting 30-40% of the utterances, and masking them one after the other before feeding the whole dialogue into the generation model. The whole process can be seen in "dialog_generation.ipynb", and running the notebook will generate the augmented DS pairs (remember to generate for both sets of 500).
 
+## Dialogue Summarization with Augmented Data
 
+After adding the augmented data to the original 1000 DS pairs (saved into "dialogsum.augmented1k.jsonl"), the new file was then run through the BART model for summarization task. However, the final results did not show any improvement in summarization performance.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+For dialogue summarization, run the following command:
+```
+./run_sumarization_dialogsum_bart_base.sh
+```
+Take note to change the DialogSum loading function in "data_loader.py" from `load_mask_info_from_dialogsum` to `load_from_dialogsum`.

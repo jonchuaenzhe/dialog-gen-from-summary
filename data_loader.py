@@ -49,9 +49,9 @@ def raw_data_loader(args):
         raw_datasets = datasets.DatasetDict({"train":train_dict, "validation":validation_dict, "test":test_dict})
 
     elif 'dialogsum' in args.train_file:
-        train_dict      = load_from_dialogsum(args, args.train_file)
-        validation_dict = load_from_dialogsum(args, args.validation_file)
-        test_dict       = load_from_dialogsum(args, args.test_file)
+        train_dict      = load_mask_info_from_dialogsum(args, args.train_file)
+        validation_dict = load_mask_info_from_dialogsum(args, args.validation_file)
+        test_dict       = load_mask_info_from_dialogsum(args, args.test_file)
 
         raw_datasets = datasets.DatasetDict({"train":train_dict, "validation":validation_dict, "test":test_dict})
 

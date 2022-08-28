@@ -1,5 +1,5 @@
 #!/bin/bash
-exec > ./run_sumarization_dialogsum_bart_base_extra-finetuned1k_8epoch.log 2>&1
+exec > ./run_sumarization_dialogsum_bart_base_augmented1k.log 2>&1
 #SBATCH --output=./run_sumarization_dialogsum_bart_base.log
 #SBATCH --ntasks=1
 #SBATCH --gres=gpu:1
@@ -17,7 +17,7 @@ echo "= = = = = = = = = = = = = ="
 
 python train.py \
     --output_dir ./output/run_sumarization_dialogsum_bart_base \
-    --train_file ./data/dialogsum/dialogsum.extra-finetuned_w1k.jsonl \
+    --train_file ./data/dialogsum/dialogsum.augmented1k.jsonl \
     --validation_file ./data/dialogsum/dialogsum.dev.jsonl \
     --test_file ./data/dialogsum/dialogsum.test.jsonl \
     --text_column dialogue \
